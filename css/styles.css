@@ -1,0 +1,529 @@
+/* ==========================================
+   TeacherTime — Design System
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ---------- Design Tokens (Light) ---------- */
+:root {
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "Courier New", monospace;
+    --radius: 0.5rem;
+
+    --background: 0 0% 100%;
+    --foreground: 240 5% 12%;
+    --border: 240 4% 90%;
+    --card: 240 3% 98%;
+    --card-foreground: 240 5% 12%;
+    --card-border: 240 4% 94%;
+    --primary: 215 85% 28%;
+    --primary-foreground: 215 85% 98%;
+    --secondary: 240 4% 88%;
+    --secondary-foreground: 240 5% 12%;
+    --muted: 240 5% 90%;
+    --muted-foreground: 240 4% 45%;
+    --accent: 240 6% 88%;
+    --accent-foreground: 240 5% 12%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 240 5% 75%;
+    --ring: 215 85% 28%;
+
+    --shadow-sm: 0px 1px 3px 0px hsl(240 5% 12% / .06), 0px 1px 2px -1px hsl(240 5% 12% / .06);
+    --shadow: 0px 1px 3px 0px hsl(240 5% 12% / .08), 0px 1px 2px -1px hsl(240 5% 12% / .08);
+    --shadow-md: 0px 4px 6px -1px hsl(240 5% 12% / .08), 0px 2px 4px -2px hsl(240 5% 12% / .08);
+    --shadow-lg: 0px 10px 15px -3px hsl(240 5% 12% / .08), 0px 4px 6px -4px hsl(240 5% 12% / .08);
+
+    --elevate-1: rgba(0, 0, 0, .03);
+    --elevate-2: rgba(0, 0, 0, .08);
+}
+
+/* ---------- Design Tokens (Dark) ---------- */
+.dark {
+    --background: 240 5% 8%;
+    --foreground: 240 3% 92%;
+    --border: 240 4% 14%;
+    --card: 240 4% 10%;
+    --card-foreground: 240 3% 92%;
+    --card-border: 240 4% 12%;
+    --primary: 215 85% 32%;
+    --primary-foreground: 215 85% 98%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 240 3% 92%;
+    --muted: 240 4% 15%;
+    --muted-foreground: 240 3% 60%;
+    --accent: 240 5% 16%;
+    --accent-foreground: 240 3% 92%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 240 5% 30%;
+    --ring: 215 85% 32%;
+
+    --shadow-sm: 0px 1px 3px 0px hsl(240 5% 0% / .25), 0px 1px 2px -1px hsl(240 5% 0% / .25);
+    --shadow: 0px 1px 3px 0px hsl(240 5% 0% / .3), 0px 1px 2px -1px hsl(240 5% 0% / .3);
+    --shadow-md: 0px 4px 6px -1px hsl(240 5% 0% / .35), 0px 2px 4px -2px hsl(240 5% 0% / .35);
+    --shadow-lg: 0px 10px 15px -3px hsl(240 5% 0% / .35), 0px 4px 6px -4px hsl(240 5% 0% / .35);
+
+    --elevate-1: rgba(255, 255, 255, .04);
+    --elevate-2: rgba(255, 255, 255, .09);
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.text-muted {
+    color: hsl(var(--muted-foreground));
+}
+
+.text-primary {
+    color: hsl(var(--primary));
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--card-border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* ---------- Glassmorphism (legacy compat) ---------- */
+.glass {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--card-border));
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+}
+
+.btn-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+}
+
+.btn-secondary:hover {
+    background: hsl(var(--accent));
+}
+
+.btn-destructive {
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+}
+
+.btn-destructive:hover {
+    filter: brightness(1.1);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: hsl(var(--foreground));
+}
+
+.btn-ghost:hover {
+    background: hsl(var(--accent));
+}
+
+.btn-outline {
+    background: transparent;
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+}
+
+.btn-outline:hover {
+    background: hsl(var(--accent));
+}
+
+/* ---------- Hover Elevate (TeacherTime signature) ---------- */
+.hover-elevate {
+    position: relative;
+}
+
+.hover-elevate::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transition: background 0.2s ease;
+}
+
+.hover-elevate:hover::after {
+    background-color: var(--elevate-1);
+}
+
+/* ---------- Inputs ---------- */
+.input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+
+.input::placeholder {
+    color: hsl(var(--muted-foreground));
+}
+
+textarea.input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+    background: hsl(var(--card));
+    border-right: 1px solid hsl(var(--border));
+    width: 18rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+.sidebar-active {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.nav-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius);
+    border: none;
+    background: transparent;
+    color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: var(--font-sans);
+}
+
+.nav-btn:hover {
+    background: hsl(var(--accent));
+}
+
+.nav-btn.sidebar-active {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+/* ---------- Metric Cards ---------- */
+.metric-card {
+    padding: 1rem;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--card-border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-card .label {
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 0.25rem;
+}
+
+.metric-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+}
+
+/* ---------- Badge ---------- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    flex-shrink: 0;
+    border: 1px solid transparent;
+}
+
+/* ---------- Icon Box ---------- */
+.icon-box {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius);
+    background: hsl(var(--primary) / 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(var(--primary));
+    flex-shrink: 0;
+}
+
+/* ---------- Feature Card ---------- */
+.feature-card {
+    padding: 1.5rem;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--card-border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.feature-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.animate-delay-1 {
+    animation-delay: 0.1s;
+    opacity: 0;
+}
+
+.animate-delay-2 {
+    animation-delay: 0.2s;
+    opacity: 0;
+}
+
+.animate-delay-3 {
+    animation-delay: 0.3s;
+    opacity: 0;
+}
+
+.animate-delay-4 {
+    animation-delay: 0.4s;
+    opacity: 0;
+}
+
+/* ---------- Layout Helpers ---------- */
+.container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.gap-3 {
+    gap: 0.75rem;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.gap-6 {
+    gap: 1.5rem;
+}
+
+.gap-8 {
+    gap: 2rem;
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.max-w-xl {
+    max-width: 36rem;
+}
+
+.space-y-3>*+* {
+    margin-top: 0.75rem;
+}
+
+.space-y-4>*+* {
+    margin-top: 1rem;
+}
+
+.space-y-6>*+* {
+    margin-top: 1.5rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .md-hidden {
+        display: none;
+    }
+
+    .md-show {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .md-hidden {
+        display: block;
+    }
+}
+
+/* Dash Search Results */
+#dash-search-results {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border) / 0.5);
+    backdrop-filter: blur(8px);
+    scrollbar-width: thin;
+}
+
+.search-result-item {
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    background: hsl(var(--primary) / 0.08);
+    padding-left: 0.75rem !important;
+}
+
+.admin-only {
+    /* Base style for admin-only triggers */
+}

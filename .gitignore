@@ -1,0 +1,7 @@
+node_modules
+staffsync.db
+server.log
+.DS_Store
+.env
+nohup.out
+server/seed-test-users.js

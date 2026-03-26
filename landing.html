@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TeacherTime — Professional Attendance Tracking</title>
+    <meta name="description"
+        content="Professional attendance tracking system for schools with biometric check-in, live analytics, and admin management." />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        /* ========= Landing-only styles ========= */
+
+        /* Gradient background */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(215, 85%, 28%, 0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 100%, hsl(260, 60%, 50%, 0.08) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .dark .hero-section::before {
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(215, 85%, 40%, 0.2) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 100%, hsl(260, 60%, 60%, 0.1) 0%, transparent 70%);
+        }
+
+        .hero-section > * { position: relative; z-index: 1; }
+
+        /* Floating particles canvas */
+        #particles-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Animated SVG Clock */
+        .hero-clock {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 2.5rem;
+            filter: drop-shadow(0 20px 40px hsl(215, 85%, 28%, 0.3));
+            animation: clockFloat 4s ease-in-out infinite;
+        }
+
+        .dark .hero-clock {
+            filter: drop-shadow(0 20px 40px hsl(215, 85%, 50%, 0.25));
+        }
+
+        @keyframes clockFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .clock-face { fill: hsl(var(--card) / 0.6); stroke: hsl(var(--primary) / 0.7); stroke-width: 2.5; }
+        .clock-tick { stroke: hsl(var(--muted-foreground)); stroke-width: 1.5; stroke-linecap: round; }
+        .clock-tick-major { stroke: hsl(var(--foreground)); stroke-width: 2.5; }
+        .clock-hand-hour { stroke: hsl(var(--foreground)); stroke-width: 4; stroke-linecap: round; }
+        .clock-hand-minute { stroke: hsl(var(--primary)); stroke-width: 3; stroke-linecap: round; }
+        .clock-hand-second { stroke: hsl(0, 72%, 50%); stroke-width: 1.5; stroke-linecap: round; }
+        .clock-center { fill: hsl(var(--primary)); }
+        .clock-center-ring { fill: none; stroke: hsl(var(--foreground)); stroke-width: 1; }
+
+        /* Title shimmer */
+        .hero-title {
+            font-size: clamp(2.25rem, 5vw, 3.75rem);
+            font-weight: 800;
+            line-height: 1.08;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-title .shimmer {
+            background: linear-gradient(120deg, hsl(215, 85%, 28%), hsl(260, 70%, 50%), hsl(215, 85%, 28%));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .dark .hero-title .shimmer {
+            background: linear-gradient(120deg, hsl(215, 85%, 60%), hsl(280, 70%, 70%), hsl(215, 85%, 60%));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* CTA Buttons — Apple Glass */
+        .cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+        .cta-btn {
+            padding: 0.875rem 2.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .cta-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+            background-size: 200% 100%;
+            animation: btnShine 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes btnShine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .cta-primary {
+            background: hsl(var(--primary) / 0.85);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            color: hsl(var(--primary-foreground));
+            border: 1px solid hsl(var(--primary-foreground) / 0.15);
+            box-shadow: 0 4px 24px hsl(215, 85%, 28%, 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.1);
+        }
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px hsl(215, 85%, 28%, 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.15);
+            background: hsl(var(--primary) / 0.95);
+        }
+        .cta-outline {
+            background: hsl(var(--card) / 0.25);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            color: hsl(var(--foreground));
+            border: 1px solid hsl(var(--border) / 0.5);
+            box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.06);
+        }
+        .cta-outline:hover {
+            border-color: hsl(var(--primary) / 0.5);
+            color: hsl(var(--primary));
+            transform: translateY(-3px);
+            background: hsl(var(--card) / 0.35);
+            box-shadow: 0 4px 20px hsl(215, 85%, 28%, 0.15), inset 0 1px 0 hsl(0 0% 100% / 0.1);
+        }
+
+        /* Feature cards with stagger animation */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 72rem;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .feature-card-v2 {
+            background: hsl(var(--card) / 0.45);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid hsl(var(--card-border) / 0.4);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(30px);
+            box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.05);
+        }
+
+        .feature-card-v2.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card-v2:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px hsl(215, 85%, 28%, 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.08);
+            border-color: hsl(var(--primary) / 0.35);
+            background: hsl(var(--card) / 0.6);
+        }
+
+        .feature-card-v2::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, hsl(var(--primary)), hsl(260, 70%, 50%));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card-v2:hover::before { transform: scaleX(1); }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(260, 70%, 50%, 0.1));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid hsl(var(--primary) / 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: hsl(var(--primary));
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card-v2:hover .feature-icon { transform: scale(1.1) rotate(-5deg); }
+
+        /* Stat counters */
+        .stats-section {
+            padding: 4rem 1.5rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            max-width: 48rem;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background: hsl(var(--card) / 0.3);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid hsl(var(--border) / 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.05);
+        }
+
+        .stat-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+            border-color: hsl(var(--primary) / 0.3);
+            box-shadow: 0 8px 30px hsl(215, 85%, 28%, 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.08);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(260, 70%, 50%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        /* Big CTA block */
+        .bottom-cta {
+            padding: 5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bottom-cta::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% 100%, hsl(215, 85%, 28%, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Live time bar */
+        .live-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--card-border));
+            font-size: 0.8rem;
+            font-weight: 500;
+            font-family: var(--font-mono);
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: hsl(142, 70%, 40%);
+            box-shadow: 0 0 8px hsl(142, 70%, 40%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollBounce 2s infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Navbar glass */
+        .landing-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: hsl(var(--background) / 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid hsl(var(--border) / 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .landing-nav.scrolled { box-shadow: var(--shadow-md); }
+
+        /* Footer */
+        .landing-footer {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid hsl(var(--border));
+        }
+
+        @media (max-width: 600px) {
+            .hero-clock { width: 160px; height: 160px; }
+            .stats-grid { gap: 2rem; }
+            .stat-number { font-size: 2rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ====== Navbar ====== -->
+    <nav class="landing-nav" id="landing-nav">
+        <div class="container flex items-center justify-between" style="height:4rem;">
+            <a href="landing.html"
+                style="display:flex;align-items:center;gap:0.75rem;text-decoration:none;color:hsl(var(--foreground));">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                    stroke="hsl(var(--primary))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span style="font-size:1.125rem;font-weight:700;letter-spacing:-0.03em;">TeacherTime</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <button class="theme-toggle btn-ghost btn" style="width:2.5rem;height:2.5rem;padding:0;"
+                    title="Toggle theme">
+                    <svg class="theme-icon-svg" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path class="theme-icon-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                    </svg>
+                </button>
+                <a href="login.html" class="btn btn-outline" style="border-radius:9999px;font-size:0.8rem;padding:0.5rem 1.25rem;">Sign In</a>
+                <a href="signup.html" class="btn btn-primary" style="border-radius:9999px;font-size:0.8rem;padding:0.5rem 1.25rem;">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ====== Hero ====== -->
+    <section class="hero-section" id="hero">
+        <canvas id="particles-canvas"></canvas>
+
+        <!-- Live Time Bar -->
+        <div class="live-bar">
+            <div class="live-dot"></div>
+            <span id="live-time">--:--:-- --</span>
+        </div>
+
+        <!-- Animated Clock -->
+        <svg class="hero-clock" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Face -->
+            <circle cx="100" cy="100" r="92" class="clock-face" />
+
+            <!-- Tick marks -->
+            <g id="clock-ticks"></g>
+
+            <!-- Hands -->
+            <line id="hand-hour" x1="100" y1="100" x2="100" y2="50" class="clock-hand-hour" />
+            <line id="hand-minute" x1="100" y1="100" x2="100" y2="30" class="clock-hand-minute" />
+            <line id="hand-second" x1="100" y1="100" x2="100" y2="25" class="clock-hand-second" />
+
+            <!-- Center dot -->
+            <circle cx="100" cy="100" r="5" class="clock-center" />
+            <circle cx="100" cy="100" r="3" class="clock-center-ring" />
+        </svg>
+
+        <!-- Title -->
+        <h1 class="hero-title animate-fade-in-up">
+            Smart Attendance<br />
+            <span class="shimmer">For Modern Schools</span>
+        </h1>
+
+        <p class="text-muted animate-fade-in-up animate-delay-1"
+            style="font-size:1.1rem;max-width:36rem;margin:0 auto;line-height:1.7;">
+            Biometric check-ins, live analytics, late flagging, and full staff management — all in one elegant dashboard.
+        </p>
+
+        <div class="cta-group animate-fade-in-up animate-delay-2">
+            <a href="signup.html" class="cta-btn cta-primary">Start Free</a>
+            <a href="login.html" class="cta-btn cta-outline">Sign In</a>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="hsl(var(--muted-foreground))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- ====== Stats ====== -->
+    <section class="stats-section" id="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item" data-target="500" data-suffix="+">
+                <div class="stat-number" id="stat-1">0</div>
+                <div class="stat-label">Schools Active</div>
+            </div>
+            <div class="stat-item" data-target="12000" data-suffix="+">
+                <div class="stat-number" id="stat-2">0</div>
+                <div class="stat-label">Staff Members</div>
+            </div>
+            <div class="stat-item" data-target="99" data-suffix="%">
+                <div class="stat-number" id="stat-3">0</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-item" data-target="4" data-suffix=".9★">
+                <div class="stat-number" id="stat-4">0</div>
+                <div class="stat-label">User Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== Features ====== -->
+    <section style="padding:3rem 0 5rem;" id="features-section">
+        <div style="text-align:center;margin-bottom:3rem;">
+            <h2 style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;">Everything You Need</h2>
+            <p class="text-muted" style="font-size:1rem;margin-top:0.5rem;">Powerful features for schools of every size.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11"/><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">Biometric Check-In</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Fingerprint and Face ID powered by WebAuthn. No hardware needed — just your device.</p>
+            </div>
+
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">Live Analytics</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Real-time charts showing hours worked, attendance trends, and punctuality across your school.</p>
+            </div>
+
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">Late Arrival Flags</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Automatic tardiness detection based on your configured school start time.</p>
+            </div>
+
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">Staff Management</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Full directory with profile photos, subject assignments, and detailed attendance history per teacher.</p>
+            </div>
+
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">CSV Export</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Download filtered attendance reports anytime for record-keeping and payroll integration.</p>
+            </div>
+
+            <div class="feature-card-v2">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <h3 style="font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;">Leave Logging</h3>
+                <p class="text-muted" style="font-size:0.85rem;line-height:1.65;">Staff log sick days and personal time. Admins approve or deny from a centralized feed.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== Bottom CTA ====== -->
+    <section class="bottom-cta">
+        <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:1rem;position:relative;z-index:1;">
+            Ready to Get Started?
+        </h2>
+        <p class="text-muted" style="font-size:1rem;max-width:28rem;margin:0 auto 2rem;position:relative;z-index:1;">
+            Join hundreds of schools already using TeacherTime to streamline their attendance.
+        </p>
+        <a href="signup.html" class="cta-btn cta-primary" style="position:relative;z-index:1;">Create Free Account</a>
+    </section>
+
+    <!-- ====== Footer ====== -->
+    <footer class="landing-footer">
+        <p class="text-muted" style="font-size:0.8rem;">&copy; 2026 TeacherTime. Professional attendance tracking for educators.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        initTheme();
+
+        // =================== LIVE CLOCK ===================
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours() % 12;
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ms = now.getMilliseconds();
+
+            const sDeg = ((s + ms / 1000) / 60) * 360;
+            const mDeg = ((m + s / 60) / 60) * 360;
+            const hDeg = ((h + m / 60) / 12) * 360;
+
+            setHand('hand-second', sDeg, 100, 75);
+            setHand('hand-minute', mDeg, 100, 70);
+            setHand('hand-hour', hDeg, 100, 50);
+
+            requestAnimationFrame(updateClock);
+        }
+
+        function setHand(id, deg, cx, len) {
+            const rad = (deg - 90) * (Math.PI / 180);
+            const x2 = cx + len * Math.cos(rad) * 0.72;
+            const y2 = cx + len * Math.sin(rad) * 0.72;
+            const el = document.getElementById(id);
+            if (el) {
+                el.setAttribute('x2', x2.toFixed(2));
+                el.setAttribute('y2', y2.toFixed(2));
+            }
+        }
+
+        // Generate tick marks
+        (function buildTicks() {
+            const g = document.getElementById('clock-ticks');
+            if (!g) return;
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6 - 90) * (Math.PI / 180);
+                const isMajor = i % 5 === 0;
+                const r1 = isMajor ? 76 : 82;
+                const r2 = 88;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', (100 + r1 * Math.cos(angle)).toFixed(2));
+                line.setAttribute('y1', (100 + r1 * Math.sin(angle)).toFixed(2));
+                line.setAttribute('x2', (100 + r2 * Math.cos(angle)).toFixed(2));
+                line.setAttribute('y2', (100 + r2 * Math.sin(angle)).toFixed(2));
+                line.setAttribute('class', isMajor ? 'clock-tick clock-tick-major' : 'clock-tick');
+                g.appendChild(line);
+            }
+        })();
+
+        updateClock();
+
+        // =================== LIVE TIME BAR ===================
+        function updateLiveTime() {
+            const el = document.getElementById('live-time');
+            if (!el) return;
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateLiveTime, 1000);
+        updateLiveTime();
+
+        // =================== PARTICLE SYSTEM ===================
+        (function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let W, H;
+            const particles = [];
+            const COUNT = 50;
+
+            function resize() {
+                W = canvas.width = canvas.offsetWidth;
+                H = canvas.height = canvas.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < COUNT; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 2 + 1,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    alpha: Math.random() * 0.3 + 0.1
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                const isDark = document.documentElement.classList.contains('dark');
+                const color = isDark ? '215, 85%, 60%' : '215, 85%, 28%';
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = W;
+                    if (p.x > W) p.x = 0;
+                    if (p.y < 0) p.y = H;
+                    if (p.y > H) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsla(${color}, ${p.alpha})`;
+                    ctx.fill();
+                });
+
+                // Draw connections
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `hsla(${color}, ${0.08 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // =================== SCROLL ANIMATIONS ===================
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Animate stat counters
+                    if (entry.target.classList.contains('stat-item')) {
+                        animateCounter(entry.target);
+                    }
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('.feature-card-v2, .stat-item').forEach((el, i) => {
+            el.style.transitionDelay = `${i * 0.1}s`;
+            observer.observe(el);
+        });
+
+        function animateCounter(el) {
+            const target = parseInt(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const numEl = el.querySelector('.stat-number');
+            if (!numEl || numEl.dataset.animated) return;
+            numEl.dataset.animated = 'true';
+
+            let current = 0;
+            const step = Math.ceil(target / 40);
+            const interval = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(interval);
+                }
+                numEl.textContent = current.toLocaleString() + suffix;
+            }, 40);
+        }
+
+        // =================== NAVBAR SCROLL EFFECT ===================
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('landing-nav');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+    </script>
+</body>
+
+</html>

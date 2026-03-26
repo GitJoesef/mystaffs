@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TeacherTime — Dashboard</title>
+    <meta name="description"
+        content="TeacherTime attendance dashboard — track hours, manage staff, and view analytics." />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <div style="display:flex;min-height:100vh;">
+
+        <!-- ====== Sidebar ====== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    stroke="hsl(var(--primary))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <div>
+                    <div style="font-weight:700;font-size:1.125rem;">TeacherTime</div>
+                    <div class="text-muted" style="font-size:0.7rem;">Attendance & Staff Management</div>
+                </div>
+            </div>
+
+            <nav id="sidebar-nav" class="flex-1 space-y-3"></nav>
+
+            <div class="mt-auto">
+                <div class="text-muted" style="font-size:0.75rem;">Role</div>
+                <div id="sidebar-role" style="font-weight:600;">Loading</div>
+                <div style="margin-top:0.75rem;">
+                    <button class="logout-btn btn btn-destructive w-full" style="justify-content:flex-start;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ====== Main Content ====== -->
+        <main class="flex-1" style="padding:1.5rem;overflow-y:auto;">
+
+            <!-- Header -->
+            <header class="flex items-center justify-between" style="margin-bottom:1.5rem;gap:1rem;">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <h1 id="title" style="font-size:1.5rem;font-weight:700;">Dashboard</h1>
+                        <p id="subtitle" class="text-muted" style="font-size:0.875rem;">Welcome back! Here's your
+                            attendance overview.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 flex-1 justify-end">
+                    <!-- Dashboard Search Bar (Visible for Admin) -->
+                    <div id="dash-search-container" class="admin-only"
+                        style="flex: 1; max-width: 400px; position: relative; display: none;">
+                        <input id="dash-staff-search" type="text" class="input"
+                            style="width: 100%; font-size: 0.875rem; padding-left: 2.5rem;"
+                            placeholder="Search staff by name, subject, or class..."
+                            oninput="handleDashboardSearch(event)" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); opacity: 0.5;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <div id="dash-search-results" class="card shadow-lg"
+                            style="position: absolute; top: 110%; left: 0; right: 0; z-index: 100; max-height: 300px; overflow-y: auto; display: none; padding: 0.5rem;">
+                        </div>
+                    </div>
+
+                    <div class="md-hidden" style="text-align:right;margin-right:0.5rem;">
+                        <div id="hdr-name" style="font-weight:600;font-size:0.875rem;">Loading</div>
+                        <div id="hdr-role" class="text-muted" style="font-size:0.75rem;">Loading</div>
+                    </div>
+                    <button class="theme-toggle btn btn-ghost" style="width:2.5rem;height:2.5rem;padding:0;"
+                        title="Toggle theme">
+                        <svg class="theme-icon-svg" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path class="theme-icon-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                        </svg>
+                    </button>
+                    <button id="profile-btn"
+                        style="width:2.5rem;height:2.5rem;border-radius:9999px;overflow:hidden;border:2px solid hsl(var(--border));cursor:pointer;padding:0;background:none;">
+                        <img id="hdr-avatar" src="https://ui-avatars.com/api/?name=User&background=1e4d8c&color=fff"
+                            style="width:100%;height:100%;object-fit:cover;" />
+                    </button>
+                </div>
+            </header>
+
+            <!-- ====== Sections ====== -->
+            <div id="main-area">
+
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="section">
+                    <div class="grid grid-3 gap-4" style="margin-bottom:1.5rem;">
+                        <div class="metric-card">
+                            <div class="label">Hours Worked</div>
+                            <div class="value" id="metric-staff">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="label">Today Events</div>
+                            <div class="value" id="metric-events">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="label">Last Event</div>
+                            <div class="value" id="metric-last" style="font-size:1rem;">—</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-3 gap-4">
+                        <div id="dash-alerts-card" class="card admin-only" style="padding:1rem; display:none;">
+                            <div class="flex items-center justify-between" style="margin-bottom:0.75rem;">
+                                <h3 style="font-weight:600;font-size:1rem;">Alerts & Notifications</h3>
+                                <span id="alert-count-badge" style="background:hsl(0, 72%, 50%); color:white; font-size:0.7rem; font-weight:700; padding:0.15rem 0.4rem; border-radius:999px;">0</span>
+                            </div>
+                            <div id="admin-alerts-list" class="space-y-2" style="max-height:12rem; overflow-y:auto; font-size:0.875rem;">
+                                <div class="text-muted">Loading alerts...</div>
+                            </div>
+                        </div>
+                        <div class="card staff-only" style="padding:1rem; display:none;">
+                            <p class="text-muted" style="font-size:0.875rem;">Authentication options are available in Check In/Out.</p>
+                        </div>
+                        <div id="dash-recent-activity" class="card" style="padding:1rem;grid-column:span 2;">
+                            <h3 style="font-weight:600;font-size:1rem;margin-bottom:0.75rem;">Recent Activity</h3>
+                            <div class="grid grid-2 gap-4">
+                                <div id="dash-personal"
+                                    style="padding:0.75rem;border:1px solid hsl(var(--border));border-radius:var(--radius);">
+                                    <div class="text-muted" style="font-size:0.75rem;margin-bottom:0.5rem;">Personal
+                                        History</div>
+                                    <div id="personal-history"
+                                        style="font-size:0.875rem;max-height:12rem;overflow-y:auto;"></div>
+                                </div>
+                                <div id="dash-admin"
+                                    style="padding:0.75rem;border:1px solid hsl(var(--border));border-radius:var(--radius);">
+                                    <div class="flex items-center justify-between" style="margin-bottom:0.5rem;">
+                                        <div class="text-muted" style="font-size:0.75rem;">Live Check-ins (Admin)</div>
+                                        <div class="pulse-indicator" style="width:8px;height:8px;border-radius:50%;background:hsl(142, 70%, 40%);box-shadow:0 0 8px hsl(142, 70%, 40%);"></div>
+                                    </div>
+                                    <div id="live-feed" class="text-muted space-y-2"
+                                        style="font-size:0.875rem;max-height:12rem;overflow-y:auto;padding-right:0.25rem;">
+                                        Loading feed...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check In/Out Section -->
+                <div id="check-section" class="section" style="display:none;">
+                    <div class="card" style="padding:1.5rem;">
+                        <h3 style="font-weight:600;font-size:1rem;margin-bottom:1rem;">Check In / Out</h3>
+                        <div class="grid grid-2 gap-6">
+                            <!-- Check In -->
+                            <div>
+                                <h4
+                                    style="font-size:0.875rem;font-weight:600;margin-bottom:0.75rem;color:hsl(142, 70%, 35%);">
+                                    Check In</h4>
+                                <div class="space-y-3">
+
+                                    <div class="feature-card flex gap-3 items-start" style="padding:1rem;">
+                                        <div class="icon-box" style="width:2.5rem;height:2.5rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                <path d="M7 11V7a5 5 0 0110 0v4" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div style="font-weight:600;font-size:0.875rem;">PIN Code</div>
+                                            <p class="text-muted" style="font-size:0.75rem;margin:0.25rem 0 0.5rem;">
+                                                Enter your 4-digit PIN</p>
+                                            <button id="pin-checkin-btn" onclick="doCheckIn('pin')"
+                                                class="btn btn-primary"
+                                                style="padding:0.375rem 0.75rem;font-size:0.8rem;">Check In with
+                                                PIN</button>
+                                        </div>
+                                    </div>
+                                    <div class="feature-card flex gap-3 items-start" style="padding:1rem;">
+                                        <div class="icon-box" style="width:2.5rem;height:2.5rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path
+                                                    d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11s1.343 3 3 3 3-1.343 3-3z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div style="font-weight:600;font-size:0.875rem;">Fingerprint / Face ID</div>
+                                            <p class="text-muted" style="font-size:0.75rem;margin:0.25rem 0 0.5rem;">
+                                                Secure biometric check-in</p>
+                                            <button id="fingerprint-checkin-btn" onclick="doCheckIn('fingerprint')"
+                                                class="btn btn-secondary"
+                                                style="padding:0.375rem 0.75rem;font-size:0.8rem;">Check In</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Check Out -->
+                            <div>
+                                <h4
+                                    style="font-size:0.875rem;font-weight:600;margin-bottom:0.75rem;color:hsl(0, 72%, 50%);">
+                                    Check Out</h4>
+                                <div class="space-y-3">
+
+                                    <div class="feature-card flex gap-3 items-start" style="padding:1rem;">
+                                        <div class="icon-box" style="width:2.5rem;height:2.5rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                <path d="M7 11V7a5 5 0 0110 0v4" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div style="font-weight:600;font-size:0.875rem;">PIN Code</div>
+                                            <p class="text-muted" style="font-size:0.75rem;margin:0.25rem 0 0.5rem;">
+                                                Enter your 4-digit PIN</p>
+                                            <button id="pin-checkout-btn" onclick="doCheckOut('pin')"
+                                                class="btn btn-destructive"
+                                                style="padding:0.375rem 0.75rem;font-size:0.8rem;">Check Out with
+                                                PIN</button>
+                                        </div>
+                                    </div>
+                                    <div class="feature-card flex gap-3 items-start" style="padding:1rem;">
+                                        <div class="icon-box" style="width:2.5rem;height:2.5rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path
+                                                    d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11s1.343 3 3 3 3-1.343 3-3z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div style="font-weight:600;font-size:0.875rem;">Fingerprint / Face ID</div>
+                                            <p class="text-muted" style="font-size:0.75rem;margin:0.25rem 0 0.5rem;">
+                                                Secure biometric check-out</p>
+                                            <button id="fingerprint-checkout-btn" onclick="doCheckOut('fingerprint')"
+                                                class="btn btn-secondary"
+                                                style="padding:0.375rem 0.75rem;font-size:0.8rem;">Check Out</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div id="analytics-section" class="section" style="display:none;">
+                    <div class="card" style="padding:1.5rem;">
+                        <h3 style="font-weight:600;font-size:1rem;margin-bottom:1rem;">Analytics</h3>
+                        <div class="grid grid-3 gap-4" style="margin-bottom:1rem;">
+                            <div class="metric-card">
+                                <div class="label">Hours Worked</div>
+                                <div class="value" id="analytics-metric-hours">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Total Events</div>
+                                <div class="value" id="analytics-metric-events">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Last Event</div>
+                                <div class="value" id="analytics-metric-last" style="font-size:1rem;">—</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between flex-wrap gap-2" style="margin-bottom:1rem;">
+                            <div class="flex items-center gap-2">
+                                <h4 style="font-size:0.875rem; font-weight:600; margin:0; margin-right:1rem;">Daily Hours</h4>
+                                <div class="flex items-center gap-1" style="background:hsl(var(--muted)); padding:0.25rem; border-radius:var(--radius);">
+                                    <button onclick="presetDate('today')" class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;">Today</button>
+                                    <button onclick="presetDate('week')" class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;">This Week</button>
+                                    <button onclick="presetDate('month')" class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;">This Month</button>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="date" id="date-start" class="input" style="padding:0.25rem 0.5rem; font-size:0.75rem;" />
+                                <span class="text-muted" style="font-size:0.75rem;">to</span>
+                                <input type="date" id="date-end" class="input" style="padding:0.25rem 0.5rem; font-size:0.75rem;" />
+                                <button onclick="applyDateFilter()" class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;">Apply</button>
+                                <button onclick="exportCSV()" class="btn btn-primary" style="padding:0.25rem 0.5rem; font-size:0.75rem;">Export CSV</button>
+                            </div>
+                        </div>
+
+                        <!-- Bar Chart Container -->
+                        <div
+                            style="margin-bottom:1.5rem; border:1px solid hsl(var(--border)); border-radius:var(--radius); padding:1rem; background:hsl(var(--card)); box-shadow:var(--shadow-sm);">
+                            <div style="position:relative; height:250px; width:100%;">
+                                <canvas id="attendance-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-2 gap-4">
+                            <div
+                                style="padding:0.75rem;border:1px solid hsl(var(--border));border-radius:var(--radius);">
+                                <div class="text-muted" style="font-size:0.75rem;margin-bottom:0.5rem;">Personal History
+                                </div>
+                                <div id="analytics-personal-history"
+                                    style="font-size:0.875rem;max-height:12rem;overflow-y:auto;"></div>
+                            </div>
+                            <div id="analytics-admin-card"
+                                style="padding:0.75rem;border:1px solid hsl(var(--border));border-radius:var(--radius);">
+                                <div class="text-muted" style="font-size:0.75rem;margin-bottom:0.5rem;">Admin — Staff
+                                    History</div>
+                                <div id="analytics-admin-history" class="text-muted"
+                                    style="font-size:0.875rem;max-height:12rem;overflow-y:auto;">(select a staff from
+                                    the list)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leave Logging Section -->
+                <div id="leaves-section" class="section" style="display:none;">
+                    <div class="card max-w-xl" style="padding:1.5rem;">
+                        <h3 style="font-weight:600;font-size:1rem;margin-bottom:1rem;">Log Absence or Leave</h3>
+                        <form id="leave-form" class="space-y-4">
+                            <div>
+                                <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Date of Absence</label>
+                                <input type="date" id="leave-date" class="input" required />
+                            </div>
+                            <div>
+                                <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Type</label>
+                                <select id="leave-type" class="input" required>
+                                    <option value="sick">Sick Day</option>
+                                    <option value="personal">Personal Day</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Reason (Optional)</label>
+                                <textarea id="leave-reason" class="input" rows="3" placeholder="Brief reason for absence..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+                        </form>
+                    </div>
+
+                    <div class="card admin-only" style="padding:1.5rem;margin-top:1.5rem;display:none;">
+                        <h3 style="font-weight:600;font-size:1rem;margin-bottom:1rem;">All Staff Leaves (Admin)</h3>
+                        <div id="admin-leaves-list" class="space-y-3" style="max-height:300px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-section" class="section" style="display:none;">
+                    <div class="card max-w-xl" style="padding:1.5rem;">
+                        <div class="flex items-start justify-between" style="margin-bottom:1rem;">
+                            <div>
+                                <div class="text-muted" style="font-size:0.75rem;">Your profile</div>
+                                <div style="font-weight:600;">Edit your display name and bio</div>
+                            </div>
+                            <button id="save-profile" class="btn btn-primary">Save Profile</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-center">
+                                <img id="settings-avatar-preview" src="https://ui-avatars.com/api/?name=User&background=1e4d8c&color=fff" style="width:4rem;height:4rem;border-radius:9999px;object-fit:cover;" />
+                                <div>
+                                    <label class="btn btn-secondary" style="cursor:pointer; font-size:0.75rem; padding:0.25rem 0.5rem;">
+                                        Upload Photo
+                                        <input type="file" id="photo-upload" accept="image/png, image/jpeg, image/webp" style="display:none;" />
+                                    </label>
+                                    <div class="text-muted" style="font-size:0.7rem;margin-top:0.25rem;">Max 2MB</div>
+                                </div>
+                            </div>
+                            <input id="name-field" class="input" placeholder="Display name" />
+                            <textarea id="bio-field" class="input" rows="3"
+                                placeholder="Short bio or role summary"></textarea>
+                            <div>
+                                <div class="text-muted" style="font-size:0.875rem;margin-bottom:0.5rem;">Subjects
+                                    (select all that apply)</div>
+                                <div id="subjects-list" class="grid grid-3 gap-2"></div>
+                            </div>
+                            <div>
+                                <div class="text-muted" style="font-size:0.875rem;margin-bottom:0.5rem;">Classes (select
+                                    all that apply)</div>
+                                <div id="classes-list" class="grid grid-3 gap-2"></div>
+                            </div>
+                            <label class="flex items-center gap-2" style="cursor:pointer;">
+                                <input id="enable-fingerprint" type="checkbox" />
+                                <span style="font-size:0.875rem;">Enable Biometrics (Fingerprint / Face ID)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card max-w-xl" style="padding:1.5rem;margin-top:1rem;">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-muted" style="font-size:0.75rem;">Security</div>
+                                <div style="font-weight:600;">Set or update your PIN</div>
+                            </div>
+                            <button onclick="showPinModal()" class="btn btn-primary">Set PIN</button>
+                        </div>
+                    </div>
+                    <div class="card max-w-xl" style="padding:1.5rem;margin-top:1rem;">
+                        <div style="margin-bottom:1rem;">
+                            <div class="text-muted" style="font-size:0.75rem;">Password Management</div>
+                            <div style="font-weight:600;">Change your account password</div>
+                        </div>
+                        <form id="change-password-form" class="space-y-3">
+                            <div id="password-error"
+                                style="color:hsl(var(--destructive));font-size:0.75rem;display:none;"></div>
+                            <div id="password-success"
+                                style="color:hsl(var(--primary));font-size:0.75rem;display:none;"></div>
+                            <input type="password" id="current-password" class="input" placeholder="Current Password"
+                                required />
+                            <input type="password" id="new-password" class="input"
+                                placeholder="New Password (min 6 chars)" required minlength="6" />
+                            <button type="submit" class="btn btn-primary w-full">Update Password</button>
+                        </form>
+                    </div>
+                    
+                    <div class="card max-w-xl admin-only" style="padding:1.5rem;margin-top:1rem;display:none;">
+                        <div class="flex items-start justify-between" style="margin-bottom:1rem;">
+                            <div>
+                                <div class="text-muted" style="font-size:0.75rem;">School Configuration</div>
+                                <div style="font-weight:600;">Global parameters (Admin Only)</div>
+                            </div>
+                            <button id="save-school-settings" class="btn btn-primary">Save Config</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">School Name</label>
+                                <input id="school-name-field" class="input" placeholder="e.g. Springfield High" />
+                            </div>
+                            <div>
+                                <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Default Start Time (For Late Flags)</label>
+                                <input type="time" id="start-time-field" class="input" />
+                            </div>
+                            <div>
+                                <div class="text-muted" style="font-size:0.875rem;margin-bottom:0.5rem;">Working Days</div>
+                                <div id="working-days-list" class="grid grid-3 gap-2">
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Monday" class="work-day-cb"/> <span style="font-size:0.875rem;">Monday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Tuesday" class="work-day-cb"/> <span style="font-size:0.875rem;">Tuesday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Wednesday" class="work-day-cb"/> <span style="font-size:0.875rem;">Wednesday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Thursday" class="work-day-cb"/> <span style="font-size:0.875rem;">Thursday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Friday" class="work-day-cb"/> <span style="font-size:0.875rem;">Friday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Saturday" class="work-day-cb"/> <span style="font-size:0.875rem;">Saturday</span></label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="Sunday" class="work-day-cb"/> <span style="font-size:0.875rem;">Sunday</span></label>
+                                </div>
+                            </div>
+                            <div class="grid grid-2 gap-4">
+                                <div>
+                                    <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Available Classes (Comma separated)</label>
+                                    <textarea id="available-classes-field" class="input" style="height:80px; font-size:0.8125rem;" placeholder="Primary 1, Primary 2, JSS1..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="text-muted" style="font-size:0.75rem;display:block;margin-bottom:0.25rem;">Available Subjects (Comma separated)</label>
+                                    <textarea id="available-subjects-field" class="input" style="height:80px; font-size:0.8125rem;" placeholder="Mathematics, English, Physics..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Staff Directory Section -->
+                <div id="staff-section" class="section" style="display:none;">
+                    <!-- List View -->
+                    <div id="staff-list-view" class="card" style="padding:1.5rem;">
+                        <div class="flex items-center justify-between" style="margin-bottom:1rem;">
+                            <h3 style="font-weight:600;font-size:1rem;">Staff Directory</h3>
+                            <input id="staff-search-input" type="text" class="input"
+                                style="max-width:250px;font-size:0.875rem;" placeholder="Search staff..."
+                                oninput="handleStaffSearch(event)" />
+                        </div>
+                        <div id="staff-list" class="grid grid-3 gap-3"></div>
+                    </div>
+
+                    <!-- Detail View -->
+                    <div id="staff-detail-view" style="display:none;">
+                        <button class="btn btn-secondary" onclick="closeStaffDetail()"
+                            style="margin-bottom:1rem;padding:0.375rem 0.75rem;font-size:0.875rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" style="margin-right:0.25rem;">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            Back to Directory
+                        </button>
+
+                        <div class="card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                            <div class="flex gap-4 items-center">
+                                <img id="detail-photo" src="" style="width:4rem;height:4rem;border-radius:9999px;"
+                                    class="shadow-sm" />
+                                <div>
+                                    <h3 id="detail-name" style="font-size:1.25rem;font-weight:600;">Name</h3>
+                                    <div id="detail-role"
+                                        style="font-size:0.875rem;font-weight:500;color:hsl(var(--primary));">Role</div>
+                                </div>
+                            </div>
+                            <p id="detail-bio" class="text-muted"
+                                style="font-size:0.875rem;margin-top:1rem;max-width:32rem;"></p>
+
+                            <div style="margin-top:1.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+                                <div>
+                                    <h4
+                                        style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:hsl(var(--muted-foreground)); margin-bottom:0.75rem;">
+                                        Subjects Taught</h4>
+                                    <div id="detail-subjects" class="flex gap-2" style="flex-wrap:wrap;"></div>
+                                </div>
+                                <div>
+                                    <h4
+                                        style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:hsl(var(--muted-foreground)); margin-bottom:0.75rem;">
+                                        Assigned Classes</h4>
+                                    <div id="detail-classes" class="flex gap-2" style="flex-wrap:wrap;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-2 gap-4" style="margin-bottom:1.5rem;">
+                            <!-- Chart -->
+                            <div class="card" style="padding:1rem;">
+                                <h4 style="font-size:0.875rem; font-weight:600; margin-bottom:0.75rem;">Daily Hours</h4>
+                                <div style="position:relative; height:200px; width:100%;">
+                                    <canvas id="staff-detail-chart"></canvas>
+                                </div>
+                            </div>
+                            <!-- History -->
+                            <div class="card" style="padding:1rem;">
+                                <h4 style="font-size:0.875rem; font-weight:600; margin-bottom:0.75rem;">Attendance
+                                    History</h4>
+                                <div id="detail-history"
+                                    style="font-size:0.875rem;max-height:200px;overflow-y:auto;padding-right:0.5rem;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calendar and Notes -->
+                        <div class="grid grid-2 gap-4">
+                            <!-- Monthly Summary Grid -->
+                            <div class="card" style="padding:1rem;">
+                                <h4 style="font-size:0.875rem; font-weight:600; margin-bottom:0.75rem;">Monthly Check-in Calendar</h4>
+                                <p class="text-muted" style="font-size:0.75rem; margin-bottom:1rem;">Current Month: <span id="current-month-name" style="font-weight:600;"></span></p>
+                                <div id="monthly-summary-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:0.25rem;">
+                                    <!-- Populated by JS -->
+                                </div>
+                                <div class="flex gap-2 items-center" style="margin-top:1rem; font-size:0.65rem;">
+                                    <span style="display:inline-block; width:10px; height:10px; border-radius:3px; background:hsl(142, 70%, 45%);"></span> Present
+                                    <span style="display:inline-block; width:10px; height:10px; border-radius:3px; background:hsl(35, 90%, 50%); margin-left:1rem;"></span> Late
+                                    <span style="display:inline-block; width:10px; height:10px; border-radius:3px; background:hsl(var(--destructive)); margin-left:1rem;"></span> Absent
+                                </div>
+                            </div>
+                            
+                            <!-- Admin Notes -->
+                            <div class="card admin-only" style="padding:1rem; display:none;">
+                                <div class="flex justify-between items-center" style="margin-bottom:0.75rem;">
+                                    <h4 style="font-size:0.875rem; font-weight:600;">Private Admin Notes</h4>
+                                    <button onclick="saveAdminNote()" class="btn btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.5rem;">Save Note</button>
+                                </div>
+                                <p class="text-muted" style="font-size:0.75rem; margin-bottom:0.5rem;">Only visible to admins. Use for HR, medical, or performance notes.</p>
+                                <textarea id="detail-admin-note" class="input" rows="5" placeholder="Add notes here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile logout -->
+    <button class="logout-btn btn btn-destructive"
+        style="position:fixed;left:1rem;bottom:1rem;z-index:40;display:none;">Logout</button>
+
+    <!-- PIN Modal -->
+    <div id="pin-modal"
+        style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:1rem;">
+        <div class="card" style="padding:1.5rem;width:100%;max-width:24rem;">
+            <h3 style="font-weight:600;margin-bottom:0.75rem;">Set PIN</h3>
+            <input id="pin-field" class="input" placeholder="Enter 4+ digit PIN" style="margin-bottom:0.75rem;" />
+            <div class="flex justify-between gap-2" style="justify-content:flex-end;">
+                <button id="pin-save" class="btn btn-primary">Save</button>
+                <button id="pin-cancel" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+    <script src="js/config.js?v=2"></script>
+    <script src="js/api.js?v=2"></script>
+    <script src="js/theme.js?v=2"></script>
+    <script src="js/attendance.js?v=2"></script>
+    <script src="js/staff.js?v=2"></script>
+    <script src="js/profile.js?v=2"></script>
+    <script src="js/auth.js?v=2"></script>
+    <script src="js/navigation.js?v=2"></script>
+    <script src="js/app.js?v=2"></script>
+</body>
+
+</html>
