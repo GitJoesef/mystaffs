@@ -297,7 +297,7 @@
             document.getElementById('kiosk-school-name').textContent = schoolName + ' Kiosk';
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/kiosk/users?school_name=${encodeURIComponent(schoolName)}`);
+                const res = await fetch(`/api/kiosk/users?school_name=${encodeURIComponent(schoolName)}`);
                 const data = await res.json();
                 if(res.ok) {
                     allStaff = data.users || [];
@@ -380,7 +380,7 @@
             }
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/kiosk/check${type}`, {
+                const res = await fetch(`/api/kiosk/check${type}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: activeUser, pin: currentPin })
